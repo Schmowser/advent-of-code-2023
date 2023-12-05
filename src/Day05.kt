@@ -9,10 +9,14 @@ fun main() {
 
         val mapList = mutableListOf<Map<Int, Int>>()
 
-        input.drop(2).forEach { line ->
-            var map1 = (1 until 99).associateWith { it }.toMutableMap()
-            if (!(line == "" || line.contains("map"))) {
-                map1 = map1 // TODO
+        var map1 = (1..99).associateWith { it }.toMutableMap()
+        input.drop(2).filter { line -> line != "" }.forEach { line ->
+            if (!line.contains("map")) {
+                line.split(" ").let {
+                    for (i in 0..it[2].toInt()) {
+                        map1[it[1].toInt() + i] = it[0].toInt() + i
+                    }
+                }
             } else {
                 mapList.add(map1)
                 map1 = (1 until 99).associateWith { it }.toMutableMap()
@@ -24,10 +28,10 @@ fun main() {
         return seeds.kotlinCollectionsMinOfOrNull { seed ->
             var location = seed
             mapList.forEach {
-                location = it[location] ?: 1
+                location = it[location] ?: location
             }
             location
-        } ?: 1
+        } ?: seeds.min()
     }
 
     fun part2(input: List<String>): Int {
@@ -40,7 +44,7 @@ fun main() {
     val testResultPart1 = part1(tinput)
     testResultPart1.println()
     println("Test 1 Part 1 succeeded: ${testResultPart1 == 35}")
-    val testResultPart2 = part2(tinput)
+    val testResultPart2 = part1(input)
     testResultPart2.println()
     println("Test 1 Part 2 succeeded: ${testResultPart2 == 0}")
 
