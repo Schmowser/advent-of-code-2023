@@ -28,6 +28,7 @@ fun main() {
         //val time = 15
         //val distance = 40
 
+        // TODO: Use BigInteger
         val time = input[0].removePrefix("Time:      ").replace(" ", "").toInt()
         val distance = input[1].removePrefix("Distance:  ").replace(" ", "").toInt()
         time.println()
@@ -40,14 +41,14 @@ fun main() {
         val derivedFunction = { i: Double -> time - 2 * i }
 
 
-        var firstZero = round( time * 0.25)
+        var firstZero = round( time * 0.0)
         var oldFirstZero = firstZero
-        var lastZero = round(time * 0.75)
+        var lastZero = 71520.0
         var oldLastZero = lastZero
 
         do {
             oldFirstZero = firstZero
-            firstZero = oldFirstZero - function(oldFirstZero).toDouble() / derivedFunction(firstZero).toDouble()
+            firstZero = oldFirstZero - function(oldFirstZero) / derivedFunction(oldFirstZero)
             println("old: $oldFirstZero, new: $firstZero")
         } while (Math.abs(firstZero - oldFirstZero) > 0.5)
         println("FIRSTZERO = $firstZero")
@@ -75,7 +76,7 @@ fun main() {
     val testResultPart2 = part2(tinput)
     testResultPart2.println()
     println("Test 1 Part 2 succeeded: ${testResultPart2 == 71503}")
-    val resultPart2 = part2(input)
-    resultPart2.println()
-    println("Part 2 succeeded: ${resultPart2 == 0}")
+//    val resultPart2 = part2(input)
+//    resultPart2.println()
+//    println("Part 2 succeeded: ${resultPart2 == 0}")
 }
