@@ -7,7 +7,20 @@ fun main() {
         return input.size
     }
 
-    val input = readInput("Day01")
-    part1(input).println()
-    part2(input).println()
+    val tinput = readInput("Day10test")
+    val input = readInput("Day10")
+
+    val testResultPart1 = part1(tinput)
+    testResultPart1.println()
+    println("Test 1 Part 1 succeeded: ${testResultPart1 == 114}")
+    val resultPart1 = part1(input)
+    resultPart1.println()
+    println("Part 1 succeeded: ${resultPart1 == 114400}")
+
+    val testResultPart2 = part2(tinput)
+    testResultPart2.println()
+    println("Test 1 Part 2 succeeded: ${testResultPart2 == 2}")
+    val resultPart2 = part2(input)
+    resultPart2.println()
+    println("Part 2 succeeded: ${resultPart2 == 250825971}")
 }
