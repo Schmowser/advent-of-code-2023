@@ -7,7 +7,6 @@ fun main() {
         var nextStep = Direction.SOUTH
 
         do {
-            println("$tempPipe on $tempCoordinates")
             for (candidateDirection in tempPipe.validDirections.minus(nextStep.getCounterDirection())) {
                 val tempNextCoordinate = input[tempCoordinates.first + candidateDirection.vertical][tempCoordinates.second + candidateDirection.horizontal]
                 if (candidateDirection.getCounterDirection() in Pipe.valueOf(tempNextCoordinate.toString()).validDirections) {
@@ -29,12 +28,14 @@ fun main() {
         var tempCoordinates = startingCoordinates
         var tempPipe = Pipe.S
         var nextStep = Direction.SOUTH
+        val directions = mutableListOf<Direction>()
 
         do {
             for (candidateDirection in tempPipe.validDirections.minus(nextStep.getCounterDirection())) { // TODO: Account for borders
                 val tempNextCoordinate = input[tempCoordinates.first + candidateDirection.vertical][tempCoordinates.second + candidateDirection.horizontal]
                 if (candidateDirection.getCounterDirection() in Pipe.valueOf(tempNextCoordinate.toString()).validDirections) {
                     nextStep = candidateDirection
+                    directions.add(nextStep)
                     break
                 }
             }
@@ -43,14 +44,12 @@ fun main() {
             loopCoordinates.add(tempCoordinates)
         } while (tempPipe != Pipe.S)
 
-        // TODO: Find subloops in loopCoordinates
+        val sPipe = Pipe.entries.first {
+            it.validDirections == setOf(directions.first(), directions.last().getCounterDirection())
+        }
 
-        loopCoordinates.println()
-
-        // DEBUGGING
         val terminalOutput = input.map { it.toMutableList() }.toMutableList()
 
-        var numberOfEnclosedTiles = 0
         val tileSize = input.size to input[0].length // Assuming a square
 
         for (inputY in 1 until tileSize.first - 1) {
@@ -69,19 +68,122 @@ fun main() {
                     loopCoordinates.filter { it.first == inputY }
 
                     if (enclosedVertical && enclosedHorizontal) {
-                        //println("${inputY to inputX} | pipes on horizontal: $pipesHorizontal | pipes on vertical $pipesVertical")
                         terminalOutput[inputY][inputX] = '*'
-                        numberOfEnclosedTiles++ // TODO: Differentiate between Inside and Outside
+                    } else {
+                        terminalOutput[inputY][inputX] = ' '
+                    }
+                }
+                if (terminalOutput[inputY][inputX] == 'S') {
+                    terminalOutput[inputY][inputX] = sPipe.name.toCharArray().first()
+                }
+            }
+        }
+        for (i in terminalOutput[0].indices) {
+            if (!loopCoordinates.contains(0 to i)) {
+                terminalOutput[0][i] = ' '
+            }
+            if (!loopCoordinates.contains(terminalOutput.size - 1 to i)) {
+                terminalOutput[terminalOutput.size - 1][i] = ' '
+            }
+        }
+        for (i in terminalOutput.indices) {
+            if (!loopCoordinates.contains(i to 0)) {
+                terminalOutput[i][0] = ' '
+            }
+            if (!loopCoordinates.contains(i to terminalOutput[0].size - 1)) {
+                terminalOutput[i][terminalOutput[0].size - 1] = ' '
+            }
+        }
+
+        val zoomedTerminalOutput = MutableList(2 * terminalOutput.size - 1) {
+            MutableList(2 * terminalOutput[0].size - 1) { '*' }
+        }
+        for (a in terminalOutput.indices) {
+            for (b in terminalOutput[0].indices) {
+                zoomedTerminalOutput[2 * a][2 * b] = terminalOutput[a][b]
+            }
+        }
+        for (index in zoomedTerminalOutput.first().indices) {
+            if (index % 2 == 1) {
+                zoomedTerminalOutput.first()[index] = ' '
+            }
+        }
+        for (index in zoomedTerminalOutput.last().indices) {
+            if (index % 2 == 1) {
+                zoomedTerminalOutput.last()[index] = ' '
+            }
+        }
+        for (index in zoomedTerminalOutput.indices) {
+            if (index % 2 == 1) {
+                zoomedTerminalOutput[index][0] = ' '
+                zoomedTerminalOutput[index][zoomedTerminalOutput.first().size - 1] = ' '
+            }
+        }
+
+        for (m in zoomedTerminalOutput.indices step 2) {
+            for (n in zoomedTerminalOutput[0].indices step 2) {
+                if (n + 2 < zoomedTerminalOutput[0].size) {
+                    val previousPipe = zoomedTerminalOutput[m][n]
+                    val currentChar = zoomedTerminalOutput[m][n + 1]
+                    val nextPipe = zoomedTerminalOutput[m][n + 2]
+                    //println(previousPipe + currentChar.toString() + nextPipe)
+                    if (zoomedTerminalOutput[m][n] != ' ' && zoomedTerminalOutput[m][n] != '*'
+                        && zoomedTerminalOutput[m][n + 2] != ' ' && zoomedTerminalOutput[m][n + 2] != '*'
+                        && Pipe.valueOf(previousPipe.toString()).validDirections.contains(Direction.EAST)
+                        && Pipe.valueOf(nextPipe.toString()).validDirections.contains(Direction.WEST)) {
+                        zoomedTerminalOutput[m][n + 1] = '-'
+                    }
+                }
+
+                if (m + 2 < zoomedTerminalOutput.size) {
+                    val previousPipe = zoomedTerminalOutput[m][n]
+                    val currentChar = zoomedTerminalOutput[m + 1][n]
+                    val nextPipe = zoomedTerminalOutput[m + 2][n]
+                    //println(previousPipe + currentChar.toString() + nextPipe)
+                    if (zoomedTerminalOutput[m][n] != ' ' && zoomedTerminalOutput[m][n] != '*'
+                        && zoomedTerminalOutput[m][n] != ' ' && zoomedTerminalOutput[m][n] != '*'
+                        && Pipe.valueOf(previousPipe.toString()).validDirections.contains(Direction.SOUTH)
+                        && Pipe.valueOf(nextPipe.toString()).validDirections.contains(Direction.NORTH)) {
+                        zoomedTerminalOutput[m + 1][n] = '|'
                     }
                 }
             }
         }
 
-        // Everything after this is in red
+        var numberOfEnclosedTiles = 0
+        var lastNumberOfEnclosedTiles = Int.MAX_VALUE
+        while (numberOfEnclosedTiles != lastNumberOfEnclosedTiles) {
+            for (inputY in 1 until zoomedTerminalOutput.size - 1) {
+                for (inputX in 1 until zoomedTerminalOutput.first().size - 1) {
+                    if (zoomedTerminalOutput[inputY][inputX] == '*') {
+                        var hasConnectionToOutside = false
+                        for (i in -1..1) {
+                            for (j in -1..1) {
+                                if (zoomedTerminalOutput[inputY + i][inputX + j] == ' ') {
+                                    hasConnectionToOutside = true
+                                }
+                            }
+                        }
+                        if (hasConnectionToOutside) {
+                            zoomedTerminalOutput[inputY][inputX] = ' '
+                        }
+                    }
+                }
+            }
+            lastNumberOfEnclosedTiles = numberOfEnclosedTiles
+            numberOfEnclosedTiles = zoomedTerminalOutput.flatten().count { it == '*' }
+        }
 
-        // Resets previous color codes
+        for (p in terminalOutput.indices) {
+            for (q in terminalOutput.first().indices) {
+                terminalOutput[p][q] = zoomedTerminalOutput[2 * p][2 * q]
+            }
+        }
+
+        //zoomedTerminalOutput.map { String(it.toCharArray()).println() }
         terminalOutput.map { String(it.toCharArray()).println() }
-        return numberOfEnclosedTiles
+
+        return terminalOutput.flatten().count { it == '*' }
     }
 
     val tinput = readInput("Day10test")
@@ -113,11 +215,9 @@ fun main() {
     val test4ResultPart2 = part2(tinput5)
     test4ResultPart2.println()
     println("Test 3 Part 2 succeeded: ${test4ResultPart2 == 10}")
-
-
     val resultPart2 = part2(input)
     resultPart2.println()
-    println("Part 2 succeeded: ${resultPart2 == 525}") // Computes 741
+    println("Part 2 succeeded: ${resultPart2 == 445}")
 }
 
 fun getStartingCoordinates(input: List<String>): Pair<Int, Int> {
