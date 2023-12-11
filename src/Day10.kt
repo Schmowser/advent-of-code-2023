@@ -22,6 +22,7 @@ fun main() {
         return steps / 2
     }
 
+    // Fun Fact: Part 2 uses something called Flood Fill
     fun part2(input: List<String>): Int {
         val loopCoordinates = mutableListOf<Pair<Int, Int>>()
         val startingCoordinates = getStartingCoordinates(input)
