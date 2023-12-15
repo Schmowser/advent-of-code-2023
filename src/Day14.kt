@@ -37,9 +37,9 @@ fun main() {
     resultPart1.println()
     println("Part 1 succeeded: ${resultPart1 == 114400}")
 
-//    val testResultPart2 = part2(tinput)
-//    testResultPart2.println()
-//    println("Test 1 Part 2 succeeded: ${testResultPart2 == 2}")
+    val testResultPart2 = part2(tinput)
+    testResultPart2.println()
+    println("Test 1 Part 2 succeeded: ${testResultPart2 == 64}")
 //    val resultPart2 = part2(input)
 //    resultPart2.println()
 //    println("Part 2 succeeded: ${resultPart2 == 250825971}")
