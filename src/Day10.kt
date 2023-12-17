@@ -261,4 +261,13 @@ enum class Direction(
             WEST -> EAST
         }
     }
+
+    override fun toString(): String {
+        return when(this) {
+            NORTH -> "^"
+            EAST -> ">"
+            SOUTH -> "V"
+            WEST -> "<"
+        }
+    }
 }
