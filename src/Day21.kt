@@ -86,7 +86,7 @@ fun main() {
     println("Test 3 Part 1 succeeded: ${testResult3Part1 == 16}")
     val resultPart1 = part1(input, 64)
     resultPart1.println()
-    println("Part 1 succeeded: ${resultPart1 == 114400}")
+    println("Part 1 succeeded: ${resultPart1 == 3716}")
 
     //3511 too low
 //
